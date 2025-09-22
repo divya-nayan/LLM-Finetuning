@@ -1,13 +1,15 @@
 """Metrics computation for model evaluation."""
 
-from typing import Dict, List, Optional, Any
-import numpy as np
-import evaluate
-from sklearn.metrics import accuracy_score, f1_score, precision_recall_fscore_support
-import torch
-from rouge_score import rouge_scorer
-from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 import logging
+from typing import Any, Dict, List, Optional
+
+import evaluate
+import numpy as np
+import torch
+from nltk.translate.bleu_score import SmoothingFunction, sentence_bleu
+from rouge_score import rouge_scorer
+from sklearn.metrics import accuracy_score, f1_score, precision_recall_fscore_support
+
 from src.utils.common import decode_tokens
 
 logger = logging.getLogger(__name__)
@@ -172,8 +174,6 @@ def compute_classification_metrics(
     }
 
 
-
-
 class MetricsCalculator:
     """Advanced metrics calculator with custom metrics support."""
 
@@ -287,14 +287,16 @@ class MetricsCalculator:
             tokens = text.split()
             for n in [1, 2, 3]:
                 for i in range(len(tokens) - n + 1):
-                    ngram = tuple(tokens[i:i + n])
+                    ngram = tuple(tokens[i : i + n])
                     unique_ngrams[n].add(ngram)
                     total_ngrams[n] += 1
 
         diversity_scores = {}
         for n in [1, 2, 3]:
             if total_ngrams[n] > 0:
-                diversity_scores[f"distinct_{n}"] = len(unique_ngrams[n]) / total_ngrams[n]
+                diversity_scores[f"distinct_{n}"] = (
+                    len(unique_ngrams[n]) / total_ngrams[n]
+                )
             else:
                 diversity_scores[f"distinct_{n}"] = 0.0
 

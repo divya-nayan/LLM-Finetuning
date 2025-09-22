@@ -2,17 +2,18 @@
 
 import json
 from pathlib import Path
-from typing import Dict, List, Optional, Any
-import torch
-from torch.utils.data import DataLoader
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from peft import PeftModel
+from typing import Any, Dict, List, Optional
+
 import hydra
-from omegaconf import DictConfig
-from tqdm import tqdm
 import pandas as pd
+import torch
+from omegaconf import DictConfig
+from peft import PeftModel
 from rich.console import Console
 from rich.table import Table
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from src.data.data_loader import DataLoader as CustomDataLoader
 from src.evaluation.metrics import MetricsCalculator
@@ -207,8 +208,8 @@ class ModelEvaluator:
 
         if predictions and references:
             from src.evaluation.metrics import (
-                compute_rouge_scores,
                 compute_bleu_scores,
+                compute_rouge_scores,
             )
 
             metrics.update(compute_rouge_scores(predictions, references))
@@ -236,10 +237,12 @@ class ModelEvaluator:
             json.dump(metrics, f, indent=2)
 
         if predictions and references:
-            results_df = pd.DataFrame({
-                "reference": references,
-                "prediction": predictions,
-            })
+            results_df = pd.DataFrame(
+                {
+                    "reference": references,
+                    "prediction": predictions,
+                }
+            )
             results_df.to_csv(output_dir / "predictions.csv", index=False)
 
         logger.info(f"Results saved to {output_dir}")
@@ -336,8 +339,9 @@ class ModelEvaluator:
 
     def _benchmark_memory(self) -> Dict[str, float]:
         """Benchmark memory usage."""
-        import psutil
         import os
+
+        import psutil
 
         process = psutil.Process(os.getpid())
         memory_info = process.memory_info()

@@ -1,14 +1,16 @@
 """Inference script for fine-tuned models."""
 
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, TextStreamer
-from peft import PeftModel
-import typer
-from typing import Optional
+import json
 from pathlib import Path
+from typing import Optional
+
+import torch
+import typer
+from peft import PeftModel
 from rich.console import Console
 from rich.prompt import Prompt
-import json
+from transformers import AutoModelForCausalLM, AutoTokenizer, TextStreamer
+
 from src.utils.common import format_chat_prompt
 
 app = typer.Typer()
@@ -69,14 +71,12 @@ class InferenceEngine:
 
         if self.base_model_path:
             base_model = AutoModelForCausalLM.from_pretrained(
-                self.base_model_path,
-                **model_kwargs
+                self.base_model_path, **model_kwargs
             )
             self.model = PeftModel.from_pretrained(base_model, self.model_path)
         else:
             self.model = AutoModelForCausalLM.from_pretrained(
-                self.model_path,
-                **model_kwargs
+                self.model_path, **model_kwargs
             )
 
         self.model.eval()
@@ -141,7 +141,7 @@ class InferenceEngine:
         output = self.tokenizer.decode(generated[0], skip_special_tokens=True)
 
         if not stream:
-            response = output[len(prompt):].strip()
+            response = output[len(prompt) :].strip()
             return response
 
         return ""
@@ -151,7 +151,7 @@ class InferenceEngine:
         messages: list,
         max_new_tokens: int = 256,
         temperature: float = 0.7,
-        **kwargs
+        **kwargs,
     ) -> str:
         """Chat interface for conversational models.
 
@@ -174,24 +174,28 @@ class InferenceEngine:
             prompt = format_chat_prompt(messages)
 
         return self.generate(
-            prompt,
-            max_new_tokens=max_new_tokens,
-            temperature=temperature,
-            **kwargs
+            prompt, max_new_tokens=max_new_tokens, temperature=temperature, **kwargs
         )
-
 
 
 @app.command()
 def generate(
     model_path: str = typer.Argument(..., help="Path to fine-tuned model"),
     prompt: str = typer.Option(None, "--prompt", "-p", help="Input prompt"),
-    base_model: Optional[str] = typer.Option(None, "--base-model", "-b", help="Base model path for PEFT"),
-    max_tokens: int = typer.Option(256, "--max-tokens", "-m", help="Maximum tokens to generate"),
-    temperature: float = typer.Option(0.7, "--temperature", "-t", help="Sampling temperature"),
+    base_model: Optional[str] = typer.Option(
+        None, "--base-model", "-b", help="Base model path for PEFT"
+    ),
+    max_tokens: int = typer.Option(
+        256, "--max-tokens", "-m", help="Maximum tokens to generate"
+    ),
+    temperature: float = typer.Option(
+        0.7, "--temperature", "-t", help="Sampling temperature"
+    ),
     top_p: float = typer.Option(0.95, "--top-p", help="Top-p sampling"),
     stream: bool = typer.Option(False, "--stream", "-s", help="Stream output"),
-    interactive: bool = typer.Option(False, "--interactive", "-i", help="Interactive mode"),
+    interactive: bool = typer.Option(
+        False, "--interactive", "-i", help="Interactive mode"
+    ),
 ):
     """Generate text using fine-tuned model."""
     engine = InferenceEngine(
@@ -249,7 +253,9 @@ def batch(
     model_path: str = typer.Argument(..., help="Path to fine-tuned model"),
     input_file: str = typer.Argument(..., help="Input JSON file with prompts"),
     output_file: str = typer.Argument(..., help="Output JSON file for responses"),
-    base_model: Optional[str] = typer.Option(None, "--base-model", "-b", help="Base model path"),
+    base_model: Optional[str] = typer.Option(
+        None, "--base-model", "-b", help="Base model path"
+    ),
     max_tokens: int = typer.Option(256, "--max-tokens", "-m", help="Maximum tokens"),
     temperature: float = typer.Option(0.7, "--temperature", "-t", help="Temperature"),
 ):
@@ -277,31 +283,39 @@ def batch(
             temperature=temperature,
         )
 
-        results.append({
-            "prompt": prompt,
-            "response": response,
-        })
+        results.append(
+            {
+                "prompt": prompt,
+                "response": response,
+            }
+        )
 
     with open(output_file, "w") as f:
         json.dump(results, f, indent=2)
 
-    console.print(f"[bold green]Saved {len(results)} responses to {output_file}[/bold green]")
+    console.print(
+        f"[bold green]Saved {len(results)} responses to {output_file}[/bold green]"
+    )
 
 
 @app.command()
 def serve(
     model_path: str = typer.Argument(..., help="Path to fine-tuned model"),
-    base_model: Optional[str] = typer.Option(None, "--base-model", "-b", help="Base model path"),
+    base_model: Optional[str] = typer.Option(
+        None, "--base-model", "-b", help="Base model path"
+    ),
     host: str = typer.Option("0.0.0.0", "--host", help="Host to bind"),
     port: int = typer.Option(8000, "--port", "-p", help="Port to bind"),
 ):
     """Serve model as API endpoint."""
     try:
+        import uvicorn
         from fastapi import FastAPI, HTTPException
         from pydantic import BaseModel
-        import uvicorn
     except ImportError:
-        console.print("[bold red]FastAPI and uvicorn required for serving. Install with: pip install fastapi uvicorn[/bold red]")
+        console.print(
+            "[bold red]FastAPI and uvicorn required for serving. Install with: pip install fastapi uvicorn[/bold red]"
+        )
         return
 
     app_api = FastAPI(title="LLM Inference API")

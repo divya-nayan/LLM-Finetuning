@@ -1,15 +1,16 @@
 """Tests for evaluation metrics."""
 
 import unittest
-import numpy as np
 from unittest.mock import Mock
 
+import numpy as np
+
 from src.evaluation.metrics import (
-    compute_perplexity,
-    compute_rouge_scores,
+    MetricsCalculator,
     compute_bleu_scores,
     compute_classification_metrics,
-    MetricsCalculator
+    compute_perplexity,
+    compute_rouge_scores,
 )
 
 
@@ -85,8 +86,7 @@ class TestMetricsCalculator(unittest.TestCase):
         """Test MetricsCalculator initialization."""
         config = {"perplexity": True, "rouge": False}
         calculator = MetricsCalculator(
-            tokenizer=self.mock_tokenizer,
-            metrics_config=config
+            tokenizer=self.mock_tokenizer, metrics_config=config
         )
 
         self.assertEqual(calculator.metrics_config, config)
@@ -101,9 +101,7 @@ class TestMetricsCalculator(unittest.TestCase):
         labels = np.array([[1, 2, 3, 4, 5]])
 
         # Mock decode to return different texts
-        self.mock_tokenizer.decode.side_effect = [
-            "The cat sat on the mat"
-        ]
+        self.mock_tokenizer.decode.side_effect = ["The cat sat on the mat"]
 
         diversity = calculator.compute_diversity(predictions, labels)
 

@@ -1,17 +1,18 @@
 """Tests for utility functions."""
 
 import unittest
-import torch
-import numpy as np
 from unittest.mock import Mock
 
+import numpy as np
+import torch
+
 from src.utils.common import (
+    compute_model_size,
+    decode_tokens,
+    format_chat_prompt,
+    format_instruction_prompt,
     format_prompt,
     tokenize_text,
-    decode_tokens,
-    format_instruction_prompt,
-    format_chat_prompt,
-    compute_model_size
 )
 
 
@@ -41,7 +42,7 @@ class TestCommonUtils(unittest.TestCase):
         result = format_instruction_prompt(
             instruction="Write a poem",
             input_text="About nature",
-            output="Roses are red..."
+            output="Roses are red...",
         )
 
         self.assertIn("### Instruction:", result)
@@ -54,8 +55,7 @@ class TestCommonUtils(unittest.TestCase):
     def test_format_instruction_prompt_without_input(self):
         """Test instruction prompt without input."""
         result = format_instruction_prompt(
-            instruction="Tell a joke",
-            output="Why did the chicken..."
+            instruction="Tell a joke", output="Why did the chicken..."
         )
 
         self.assertIn("### Instruction:", result)
@@ -67,7 +67,7 @@ class TestCommonUtils(unittest.TestCase):
         messages = [
             {"role": "system", "content": "You are helpful"},
             {"role": "user", "content": "Hello"},
-            {"role": "assistant", "content": "Hi there"}
+            {"role": "assistant", "content": "Hi there"},
         ]
 
         result = format_chat_prompt(messages, add_generation_prompt=False)
@@ -78,9 +78,7 @@ class TestCommonUtils(unittest.TestCase):
 
     def test_format_chat_prompt_with_generation(self):
         """Test chat prompt with generation prompt."""
-        messages = [
-            {"role": "user", "content": "Hello"}
-        ]
+        messages = [{"role": "user", "content": "Hello"}]
 
         result = format_chat_prompt(messages, add_generation_prompt=True)
 
@@ -117,18 +115,14 @@ class TestTokenizationUtils(unittest.TestCase):
         self.mock_tokenizer = Mock()
         self.mock_tokenizer.return_value = {
             "input_ids": torch.tensor([[1, 2, 3]]),
-            "attention_mask": torch.tensor([[1, 1, 1]])
+            "attention_mask": torch.tensor([[1, 1, 1]]),
         }
         self.mock_tokenizer.pad_token_id = 0
         self.mock_tokenizer.decode.return_value = "Test text"
 
     def test_tokenize_text_single(self):
         """Test tokenizing single text."""
-        result = tokenize_text(
-            "Hello world",
-            self.mock_tokenizer,
-            max_length=10
-        )
+        result = tokenize_text("Hello world", self.mock_tokenizer, max_length=10)
 
         self.mock_tokenizer.assert_called_once()
         self.assertIn("input_ids", result)
@@ -138,11 +132,7 @@ class TestTokenizationUtils(unittest.TestCase):
         """Test decoding tensor tokens."""
         tokens = torch.tensor([1, 2, 3, 0, 0])  # With padding
 
-        result = decode_tokens(
-            tokens,
-            self.mock_tokenizer,
-            clean_padding=True
-        )
+        result = decode_tokens(tokens, self.mock_tokenizer, clean_padding=True)
 
         self.mock_tokenizer.decode.assert_called()
         self.assertEqual(result, "Test text")
@@ -153,11 +143,7 @@ class TestTokenizationUtils(unittest.TestCase):
 
         self.mock_tokenizer.decode.side_effect = ["Text 1", "Text 2"]
 
-        result = decode_tokens(
-            tokens,
-            self.mock_tokenizer,
-            clean_padding=True
-        )
+        result = decode_tokens(tokens, self.mock_tokenizer, clean_padding=True)
 
         self.assertIsInstance(result, list)
         self.assertEqual(len(result), 2)

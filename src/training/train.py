@@ -3,36 +3,36 @@
 import os
 import sys
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
+import hydra
 import torch
 import transformers
-from transformers import (
-    AutoModelForCausalLM,
-    AutoTokenizer,
-    TrainingArguments,
-    Trainer,
-    DataCollatorForLanguageModeling,
-    BitsAndBytesConfig,
-)
+import wandb
+from accelerate import Accelerator
+from omegaconf import DictConfig, OmegaConf
 from peft import (
     LoraConfig,
     TaskType,
     get_peft_model,
     prepare_model_for_kbit_training,
 )
-from accelerate import Accelerator
-import hydra
-from omegaconf import DictConfig, OmegaConf
-import wandb
 from rich.console import Console
 from rich.progress import track
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    BitsAndBytesConfig,
+    DataCollatorForLanguageModeling,
+    Trainer,
+    TrainingArguments,
+)
 
 from src.data.data_loader import DataLoader
-from src.models.model_loader import ModelLoader
-from src.utils.logger import setup_logger
-from src.utils.callbacks import CustomCallbacks
 from src.evaluation.metrics import compute_metrics as base_compute_metrics
+from src.models.model_loader import ModelLoader
+from src.utils.callbacks import CustomCallbacks
+from src.utils.logger import setup_logger
 
 console = Console()
 logger = setup_logger(__name__)
@@ -237,7 +237,9 @@ class LLMFineTuner:
             if self.config.tracking.use_wandb:
                 wandb.finish()
 
-            console.print("[bold green]Fine-tuning completed successfully![/bold green]")
+            console.print(
+                "[bold green]Fine-tuning completed successfully![/bold green]"
+            )
             return {
                 "train_metrics": train_metrics,
                 "eval_metrics": eval_metrics,

@@ -1,13 +1,13 @@
 """Tests for data loading functionality."""
 
-import unittest
-import tempfile
 import json
+import tempfile
+import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 from src.data.data_loader import DataLoader, TextDataset
-from src.utils.common import format_prompt, format_instruction_prompt
+from src.utils.common import format_instruction_prompt, format_prompt
 
 
 class TestDataLoader(unittest.TestCase):
@@ -18,7 +18,7 @@ class TestDataLoader(unittest.TestCase):
         self.mock_tokenizer = Mock()
         self.mock_tokenizer.return_value = {
             "input_ids": [[1, 2, 3]],
-            "attention_mask": [[1, 1, 1]]
+            "attention_mask": [[1, 1, 1]],
         }
         self.mock_config = Mock()
         self.mock_config.data.max_length = 512
@@ -47,9 +47,7 @@ class TestDataLoader(unittest.TestCase):
     def test_format_instruction_prompt(self):
         """Test instruction prompt formatting."""
         result = format_instruction_prompt(
-            instruction="Explain AI",
-            input_text="In simple terms",
-            output="AI is..."
+            instruction="Explain AI", input_text="In simple terms", output="AI is..."
         )
 
         self.assertIn("### Instruction:", result)
@@ -59,7 +57,7 @@ class TestDataLoader(unittest.TestCase):
 
     def test_load_json_file(self):
         """Test loading JSON file."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump([{"text": "test"}], f)
             temp_path = f.name
 
@@ -74,7 +72,7 @@ class TestDataLoader(unittest.TestCase):
 
     def test_load_jsonl_file(self):
         """Test loading JSONL file."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.jsonl', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".jsonl", delete=False) as f:
             f.write('{"text": "line1"}\n')
             f.write('{"text": "line2"}\n')
             temp_path = f.name
@@ -98,7 +96,7 @@ class TestDataPreprocessing(unittest.TestCase):
         self.mock_tokenizer = Mock()
         self.mock_tokenizer.return_value = {
             "input_ids": [[1, 2, 3]],
-            "attention_mask": [[1, 1, 1]]
+            "attention_mask": [[1, 1, 1]],
         }
 
     def test_prepare_instruction_dataset(self):
@@ -112,14 +110,14 @@ class TestDataPreprocessing(unittest.TestCase):
         examples = {
             "instruction": ["Test instruction"],
             "input": ["Test input"],
-            "output": ["Test output"]
+            "output": ["Test output"],
         }
 
         # Mock tokenize_text to return proper structure
-        with patch('src.data.data_loader.tokenize_text') as mock_tokenize:
+        with patch("src.data.data_loader.tokenize_text") as mock_tokenize:
             mock_tokenize.return_value = {
                 "input_ids": [[1, 2, 3]],
-                "attention_mask": [[1, 1, 1]]
+                "attention_mask": [[1, 1, 1]],
             }
 
             result = loader.prepare_instruction_dataset(examples)

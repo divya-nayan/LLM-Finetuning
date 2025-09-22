@@ -1,16 +1,19 @@
 """Data loader for various dataset formats and sources."""
 
 import json
-import pandas as pd
-from pathlib import Path
-from typing import Dict, List, Optional, Union, Any
-import torch
-from torch.utils.data import Dataset
-from datasets import load_dataset, Dataset as HFDataset
-from transformers import PreTrainedTokenizer
 import logging
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
+
+import pandas as pd
+import torch
+from datasets import Dataset as HFDataset
+from datasets import load_dataset
 from rich.progress import track
-from src.utils.common import format_prompt, tokenize_text, format_instruction_prompt
+from torch.utils.data import Dataset
+from transformers import PreTrainedTokenizer
+
+from src.utils.common import format_instruction_prompt, format_prompt, tokenize_text
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +55,7 @@ class TextDataset(Dataset):
             max_length=self.max_length,
             padding="max_length",
             truncation=True,
-            return_tensors="pt"
+            return_tensors="pt",
         )
 
         return {
@@ -118,9 +121,7 @@ class DataLoader:
         else:
             raise ValueError("Either dataset_name or data_path must be provided")
 
-    def _load_huggingface_dataset(
-        self, dataset_name: str, split: str
-    ) -> HFDataset:
+    def _load_huggingface_dataset(self, dataset_name: str, split: str) -> HFDataset:
         """Load dataset from HuggingFace Hub."""
         dataset = load_dataset(
             dataset_name,
@@ -213,7 +214,7 @@ class DataLoader:
             max_length=self.max_length,
             padding="max_length",
             truncation=True,
-            return_tensors=None
+            return_tensors=None,
         )
 
         model_inputs["labels"] = model_inputs["input_ids"].copy()
@@ -228,7 +229,6 @@ class DataLoader:
         else:
             return self._tokenize_function(examples)
 
-
     def prepare_instruction_dataset(self, examples: Dict[str, List]) -> Dict:
         """Prepare instruction-following dataset."""
         texts = []
@@ -240,7 +240,7 @@ class DataLoader:
             prompt = format_instruction_prompt(
                 instruction=instruction,
                 input_text=input_text if input_text else None,
-                output=output
+                output=output,
             )
             texts.append(prompt)
 
@@ -250,7 +250,7 @@ class DataLoader:
             max_length=self.max_length,
             padding="max_length",
             truncation=True,
-            return_tensors=None
+            return_tensors=None,
         )
 
         model_inputs["labels"] = model_inputs["input_ids"].copy()

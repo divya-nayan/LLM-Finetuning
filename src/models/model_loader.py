@@ -1,6 +1,9 @@
 """Model loader for various LLM architectures."""
 
-from typing import Tuple, Optional, Dict, Any
+import logging
+from pathlib import Path
+from typing import Any, Dict, Optional, Tuple
+
 import torch
 from transformers import (
     AutoModelForCausalLM,
@@ -9,8 +12,6 @@ from transformers import (
     PreTrainedModel,
     PreTrainedTokenizer,
 )
-import logging
-from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +50,9 @@ class ModelLoader:
                 int8_threshold=self.config.model.int8_threshold,
             )
         else:
-            raise ValueError(f"Unsupported quantization bits: {self.config.model.quantization_bits}")
+            raise ValueError(
+                f"Unsupported quantization bits: {self.config.model.quantization_bits}"
+            )
 
     def load(self) -> Tuple[PreTrainedModel, PreTrainedTokenizer]:
         """Load model and tokenizer.
@@ -103,10 +106,7 @@ class ModelLoader:
         else:
             model_path = self.model_name
 
-        model = AutoModelForCausalLM.from_pretrained(
-            model_path,
-            **model_kwargs
-        )
+        model = AutoModelForCausalLM.from_pretrained(model_path, **model_kwargs)
 
         return model
 

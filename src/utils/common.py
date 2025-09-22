@@ -1,15 +1,14 @@
 """Common utility functions to avoid code redundancy."""
 
-from typing import Dict, List, Optional, Any, Union
+from typing import Any, Dict, List, Optional, Union
+
+import numpy as np
 import torch
 from transformers import PreTrainedTokenizer
-import numpy as np
 
 
 def format_prompt(
-    item: Dict[str, str],
-    template: Optional[str] = None,
-    default_key: str = "text"
+    item: Dict[str, str], template: Optional[str] = None, default_key: str = "text"
 ) -> str:
     """Format data item using prompt template.
 
@@ -36,7 +35,7 @@ def tokenize_text(
     max_length: int = 512,
     padding: str = "max_length",
     truncation: bool = True,
-    return_tensors: Optional[str] = "pt"
+    return_tensors: Optional[str] = "pt",
 ) -> Dict[str, Any]:
     """Tokenize text with standard settings.
 
@@ -56,7 +55,7 @@ def tokenize_text(
         max_length=max_length,
         padding=padding,
         truncation=truncation,
-        return_tensors=return_tensors
+        return_tensors=return_tensors,
     )
 
 
@@ -64,7 +63,7 @@ def decode_tokens(
     token_ids: Union[torch.Tensor, np.ndarray, List],
     tokenizer: PreTrainedTokenizer,
     skip_special_tokens: bool = True,
-    clean_padding: bool = True
+    clean_padding: bool = True,
 ) -> Union[str, List[str]]:
     """Decode token IDs to text.
 
@@ -90,7 +89,9 @@ def decode_tokens(
                     ids = ids[ids != -100]
                     if tokenizer.pad_token_id is not None:
                         ids = ids[ids != tokenizer.pad_token_id]
-                    text = tokenizer.decode(ids, skip_special_tokens=skip_special_tokens)
+                    text = tokenizer.decode(
+                        ids, skip_special_tokens=skip_special_tokens
+                    )
                     decoded_texts.append(text)
                 return decoded_texts
             else:
@@ -106,7 +107,7 @@ def format_instruction_prompt(
     instruction: str,
     input_text: Optional[str] = None,
     output: Optional[str] = None,
-    system_prompt: Optional[str] = None
+    system_prompt: Optional[str] = None,
 ) -> str:
     """Format instruction-following prompt.
 
@@ -138,8 +139,7 @@ def format_instruction_prompt(
 
 
 def format_chat_prompt(
-    messages: List[Dict[str, str]],
-    add_generation_prompt: bool = True
+    messages: List[Dict[str, str]], add_generation_prompt: bool = True
 ) -> str:
     """Format chat messages into prompt.
 
@@ -192,5 +192,7 @@ def compute_model_size(model: torch.nn.Module) -> Dict[str, float]:
         "trainable_params": trainable_count,
         "total_size_mb": param_size_mb,
         "trainable_size_mb": trainable_size_mb,
-        "trainable_percentage": (trainable_count / param_count * 100) if param_count > 0 else 0
+        "trainable_percentage": (
+            (trainable_count / param_count * 100) if param_count > 0 else 0
+        ),
     }

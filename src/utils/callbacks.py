@@ -1,11 +1,12 @@
 """Custom callbacks for training."""
 
+import json
+import logging
+from datetime import datetime
+from pathlib import Path
+
 from transformers import TrainerCallback, TrainerControl, TrainerState
 from transformers.training_args import TrainingArguments
-import logging
-from pathlib import Path
-import json
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -56,11 +57,13 @@ class CustomCallbacks(TrainerCallback):
             if isinstance(value, float):
                 logger.info(f"  {key}: {value:.4f}")
 
-        self.metrics_history.append({
-            "step": state.global_step,
-            "timestamp": datetime.now().isoformat(),
-            **metrics
-        })
+        self.metrics_history.append(
+            {
+                "step": state.global_step,
+                "timestamp": datetime.now().isoformat(),
+                **metrics,
+            }
+        )
 
         return control
 
@@ -97,6 +100,7 @@ class CustomCallbacks(TrainerCallback):
         """
         try:
             from torch.utils.tensorboard import SummaryWriter
+
             writer = SummaryWriter(self.config.tracking.tensorboard_dir)
 
             for key, value in logs.items():

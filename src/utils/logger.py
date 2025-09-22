@@ -2,10 +2,11 @@
 
 import logging
 import sys
-from pathlib import Path
 from datetime import datetime
-from rich.logging import RichHandler
+from pathlib import Path
+
 from rich.console import Console
+from rich.logging import RichHandler
 
 
 def setup_logger(
@@ -51,9 +52,7 @@ def setup_logger(
         log_path.mkdir(parents=True, exist_ok=True)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        file_handler = logging.FileHandler(
-            log_path / f"{name}_{timestamp}.log"
-        )
+        file_handler = logging.FileHandler(log_path / f"{name}_{timestamp}.log")
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
@@ -73,7 +72,9 @@ class TrainingLogger:
         self.log_dir = Path(log_dir)
         self.log_dir.mkdir(parents=True, exist_ok=True)
 
-        self.metrics_file = self.log_dir / f"metrics_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jsonl"
+        self.metrics_file = (
+            self.log_dir / f"metrics_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jsonl"
+        )
         self.console = Console()
 
     def log_metrics(self, metrics: dict, step: int = None):
@@ -85,11 +86,7 @@ class TrainingLogger:
         """
         import json
 
-        log_entry = {
-            "timestamp": datetime.now().isoformat(),
-            "step": step,
-            **metrics
-        }
+        log_entry = {"timestamp": datetime.now().isoformat(), "step": step, **metrics}
 
         with open(self.metrics_file, "a") as f:
             f.write(json.dumps(log_entry) + "\n")
