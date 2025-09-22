@@ -1,0 +1,27 @@
+[
+  {
+    "instruction": "What is machine learning?",
+    "input": "",
+    "output": "Machine learning is a subset of artificial intelligence (AI) that enables systems to learn and improve from experience without being explicitly programmed. It focuses on developing computer programs that can access data and use it to learn for themselves."
+  },
+  {
+    "instruction": "Explain the difference between supervised and unsupervised learning",
+    "input": "",
+    "output": "Supervised learning uses labeled data to train models, where the algorithm learns from input-output pairs. Examples include classification and regression. Unsupervised learning works with unlabeled data to find hidden patterns or structures, such as clustering and dimensionality reduction."
+  },
+  {
+    "instruction": "Write a Python function",
+    "input": "to calculate the factorial of a number",
+    "output": "def factorial(n):\n    if n < 0:\n        return None  # Factorial not defined for negative numbers\n    elif n == 0 or n == 1:\n        return 1\n    else:\n        return n * factorial(n - 1)"
+  },
+  {
+    "instruction": "Translate the following text to French",
+    "input": "Hello, how are you today?",
+    "output": "Bonjour, comment allez-vous aujourd'hui?"
+  },
+  {
+    "instruction": "Summarize this text",
+    "input": "Artificial intelligence has transformed many industries over the past decade. From healthcare to finance, AI applications are helping organizations automate processes, analyze vast amounts of data, and make better decisions. Machine learning, a subset of AI, has been particularly impactful in areas like image recognition, natural language processing, and predictive analytics.",
+    "output": "AI has revolutionized various industries in the last decade by automating processes, analyzing big data, and improving decision-making, with machine learning being especially effective in image recognition, NLP, and predictive analytics."
+  }
+]

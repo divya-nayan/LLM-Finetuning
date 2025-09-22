@@ -1,0 +1,126 @@
+defaults:
+  - model: llama2
+  - data: alpaca
+  - training: default
+  - _self_
+
+project:
+  name: llm-finetuning
+  seed: 42
+  output_dir: outputs
+
+model:
+  name: meta-llama/Llama-2-7b-hf
+  cache_dir: ~/.cache/huggingface
+  device_map: auto
+  trust_remote_code: true
+  use_fast_tokenizer: true
+  padding_side: right
+  torch_dtype: float16
+  use_quantization: true
+  quantization_bits: 4
+  double_quant: true
+  quant_type: nf4
+  int8_threshold: 6.0
+  use_flash_attention: false
+  load_from_checkpoint: false
+  checkpoint_path: null
+  add_special_tokens: false
+  special_tokens: null
+
+peft:
+  lora_r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+  bias: none
+  task_type: CAUSAL_LM
+
+data:
+  dataset_name: null
+  train_path: data/train.json
+  eval_path: data/eval.json
+  max_length: 512
+  prompt_template: null
+  preprocessing_function: null
+  trust_remote_code: true
+  num_proc: 4
+
+training:
+  output_dir: outputs/models
+  num_epochs: 3
+  batch_size: 4
+  eval_batch_size: 8
+  gradient_accumulation_steps: 4
+  warmup_steps: 100
+  learning_rate: 2e-4
+  weight_decay: 0.01
+  optimizer: adamw_torch
+  lr_scheduler_type: cosine
+  max_grad_norm: 0.3
+  fp16: false
+  bf16: true
+  gradient_checkpointing: true
+  logging_steps: 10
+  eval_strategy: steps
+  eval_steps: 100
+  save_strategy: steps
+  save_steps: 500
+  save_total_limit: 3
+  load_best_model_at_end: true
+  metric_for_best_model: eval_loss
+  greater_is_better: false
+  push_to_hub: false
+  hub_model_id: null
+  resume_from_checkpoint: false
+  checkpoint_path: null
+  dataloader_num_workers: 4
+  final_model_path: outputs/final_model
+  save_merged: false
+  mixed_precision: fp16
+
+tracking:
+  use_wandb: false
+  use_tensorboard: true
+  tensorboard_dir: outputs/tensorboard
+  project_name: llm-finetuning
+  run_name: ${now:%Y-%m-%d_%H-%M-%S}
+  tags:
+    - peft
+    - llm
+    - finetuning
+  report_to:
+    - tensorboard
+
+evaluation:
+  model_path: outputs/final_model
+  dataset_path: null
+  use_base_model: false
+  batch_size: 8
+  num_workers: 4
+  output_dir: outputs/evaluation
+  max_new_tokens: 256
+  temperature: 0.7
+  top_p: 0.95
+  do_sample: true
+  num_beams: 1
+  generate_predictions: true
+  mode: dataset
+  run_speed_test: false
+  run_memory_test: false
+
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}
+  job:
+    chdir: true

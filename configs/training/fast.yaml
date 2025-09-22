@@ -1,0 +1,24 @@
+# Fast training configuration for testing and development
+output_dir: outputs/models
+num_epochs: 1
+batch_size: 2
+eval_batch_size: 4
+gradient_accumulation_steps: 2
+warmup_steps: 10
+learning_rate: 5e-4
+weight_decay: 0.01
+optimizer: adamw_torch
+lr_scheduler_type: linear
+max_grad_norm: 1.0
+fp16: true
+bf16: false
+gradient_checkpointing: false
+logging_steps: 5
+eval_strategy: steps
+eval_steps: 50
+save_strategy: steps
+save_steps: 100
+save_total_limit: 2
+load_best_model_at_end: false
+dataloader_num_workers: 2
+mixed_precision: fp16

@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  training:
+    build: .
+    image: llm-finetuning:latest
+    container_name: llm-finetuning-training
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - CUDA_VISIBLE_DEVICES=0
+      - WANDB_API_KEY=${WANDB_API_KEY}
+      - HF_TOKEN=${HF_TOKEN}
+    volumes:
+      - ./data:/app/data
+      - ./outputs:/app/outputs
+      - ./configs:/app/configs
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    command: python3 -m src.training.train
+    shm_size: '16gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  inference:
+    build: .
+    image: llm-finetuning:latest
+    container_name: llm-finetuning-inference
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - CUDA_VISIBLE_DEVICES=0
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./outputs:/app/outputs
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    command: python3 -m src.inference serve outputs/final_model --host 0.0.0.0 --port 8000
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  notebook:
+    build: .
+    image: llm-finetuning:latest
+    container_name: llm-finetuning-notebook
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - CUDA_VISIBLE_DEVICES=0
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./:/app
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    command: jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

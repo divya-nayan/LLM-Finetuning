@@ -1,0 +1,49 @@
+# Production configuration with best practices
+defaults:
+  - override model: mistral
+  - override training: default
+
+model:
+  name: mistralai/Mistral-7B-v0.1
+  use_quantization: true
+  quantization_bits: 4
+  use_flash_attention: true
+
+peft:
+  lora_r: 32
+  lora_alpha: 64
+  lora_dropout: 0.1
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+training:
+  num_epochs: 3
+  batch_size: 4
+  gradient_accumulation_steps: 8
+  learning_rate: 2e-4
+  warmup_steps: 500
+  weight_decay: 0.01
+  logging_steps: 10
+  eval_steps: 500
+  save_steps: 1000
+  save_total_limit: 3
+  fp16: false
+  bf16: true
+  gradient_checkpointing: true
+  load_best_model_at_end: true
+  metric_for_best_model: eval_loss
+
+tracking:
+  use_wandb: true
+  use_tensorboard: true
+  project_name: llm-production
+
+data:
+  max_length: 1024
+  num_proc: 8

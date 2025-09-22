@@ -1,0 +1,12 @@
+name: meta-llama/Llama-2-7b-hf
+cache_dir: ~/.cache/huggingface
+device_map: auto
+trust_remote_code: true
+use_fast_tokenizer: true
+padding_side: right
+torch_dtype: float16
+use_quantization: true
+quantization_bits: 4
+double_quant: true
+quant_type: nf4
+use_flash_attention: false

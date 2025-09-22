@@ -1,0 +1,12 @@
+[
+  {
+    "instruction": "What is deep learning?",
+    "input": "",
+    "output": "Deep learning is a subset of machine learning that uses artificial neural networks with multiple layers (deep neural networks) to progressively extract higher-level features from raw input. It's particularly effective for tasks like image recognition, speech processing, and natural language understanding."
+  },
+  {
+    "instruction": "Explain the concept of overfitting",
+    "input": "in machine learning models",
+    "output": "Overfitting occurs when a machine learning model learns the training data too well, including its noise and outliers, resulting in poor performance on new, unseen data. The model becomes too complex and fails to generalize. This can be prevented using techniques like regularization, cross-validation, and dropout."
+  }
+]

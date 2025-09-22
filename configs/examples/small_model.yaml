@@ -1,0 +1,28 @@
+# Configuration for testing with smaller models (faster, less memory)
+defaults:
+  - override model: base
+  - override training: fast
+
+model:
+  name: microsoft/phi-2
+  use_quantization: true
+  quantization_bits: 4
+  device_map: auto
+
+peft:
+  lora_r: 8
+  lora_alpha: 16
+  lora_dropout: 0.05
+
+training:
+  num_epochs: 1
+  batch_size: 2
+  learning_rate: 5e-4
+  logging_steps: 5
+  eval_steps: 50
+  save_steps: 100
+
+data:
+  max_length: 256
+  train_path: data/example_train.json
+  eval_path: data/example_eval.json

@@ -1,0 +1,16 @@
+dataset_name: tatsu-lab/alpaca
+train_path: null
+eval_path: null
+max_length: 512
+prompt_template: |
+  ### Instruction:
+  {instruction}
+
+  ### Input:
+  {input}
+
+  ### Response:
+  {output}
+preprocessing_function: prepare_instruction_dataset
+trust_remote_code: true
+num_proc: 4

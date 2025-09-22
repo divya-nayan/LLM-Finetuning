@@ -1,0 +1,17 @@
+# Base model configuration
+name: microsoft/phi-2  # Small model for testing
+cache_dir: ~/.cache/huggingface
+device_map: auto
+trust_remote_code: true
+use_fast_tokenizer: true
+padding_side: right
+torch_dtype: float16
+use_quantization: true
+quantization_bits: 4
+double_quant: true
+quant_type: nf4
+use_flash_attention: false
+load_from_checkpoint: false
+checkpoint_path: null
+add_special_tokens: false
+special_tokens: null
