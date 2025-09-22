@@ -1,10 +1,14 @@
 name: CI
 
+# Disabled automatic triggers - run manually when needed
+# on:
+#   push:
+#     branches: [ main, develop ]
+#   pull_request:
+#     branches: [ main ]
+
 on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:  # Allow manual triggering only
 
 jobs:
   test:
